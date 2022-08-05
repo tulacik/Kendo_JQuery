@@ -1,0 +1,89 @@
+<!-- html definition  -->
+<div id="personKGridDivHolder" class="d-flex flex-column">
+    <div >
+        <label>Rel.</label>
+        <!-- action buttons -->
+        <button type="button" class="btn btn-light personActionBtns" id="addpersonBtn" value="2">Aggiungi</button>
+        <button type="button" class="btn btn-light personActionBtns" id="deletepersonBtn" value="1">Elimina</button>
+        <button type="button" class="btn btn-light personActionBtns" id="modifypersonBtn" value="-1">Modifica</button>
+        <!-- action buttons -->
+        <input hidden id="selectedpersonId" value="" />
+    </div>
+    <!-- kendo grid holder -->
+    <div id="personKGrid"></div>
+    <!-- kendo grid holder -->
+</div>
+<!-- html definition  -->
+
+
+<script type="text/javascript" >
+
+    $(document).ready(function () {
+        var peopleData = @Json.Serialize(Model.PeopleList);
+        setPeopleKGrid(peopleData);
+    });
+
+    function setPeopleKGrid(peopleData) {
+
+        // set datasource
+    var peopleDS = new kendo.data.DataSource({
+            data: peopleData,
+            schema: {
+                model: {
+                    ID: "personId",
+                    fields: {
+                        personId: { type: "number" },
+                        name: { type: "string", nullable: true },
+                        surname: { type: "string", nullable: true },
+                        note: { type: "string", nullable: true },
+                        active: { type: "bool", nullable: true }
+                    }
+                }
+            }
+        });
+
+        // set kendoGrid
+            $("#personKGrid").kendoGrid({
+            dataSource: peopleDS,
+            height: 150,
+            scrollable: true,
+            selectable: "row",
+            columns: [
+                {
+                    field: "personId",
+                    title: "personId"
+                }, {
+                    field: "name",
+                    title: "Name"
+                }, {
+                    field: "surname",
+                    title: "Surname"
+                }, {
+                    field: "note",
+                    title: "Note"
+                }, {
+                    field: "active",
+                    title: "Act.",
+                    width: 50,
+                    template: '<input disabled="disabled" type="checkbox" #= active ? \'checked="checked"\' : "" # class="chkbx" />'
+                }
+                ],
+                change: function (e) {
+                    var selectedRows = this.select();
+                    for (var i = 0; i < selectedRows.length; i++) {
+                        var dataItem = this.dataItem(selectedRows[i]);
+                        $("#selectedpersonId").val(dataItem.personId);
+                    }
+                },
+        });
+
+
+        function updateGridDataSource(kgDS) {
+             var pKG = $("#personKGrid").data("kendoGrid");
+                 pKG.dataSource.data(kgDS);
+        }
+
+    }
+
+
+</script>

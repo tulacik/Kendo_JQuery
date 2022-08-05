@@ -1,0 +1,111 @@
+
+<!-- html definition  -->
+ <div class="row gx-3 mb-3">
+    <label class="small mb-1">Person</label>
+    <input hidden id="PersonId" value="@Model.PersonId" />
+    <input class="" id="PeopleKDD" >
+</div>
+<!-- html definition  -->
+
+<!-- dropdownlist template (if multiple columns present) -->
+    <script id="templateKDDLPeople" type="text/x-kendo-template">    
+        <span>
+          <table>
+              <tr class="combo-tr">
+                  <td class="combo-td">#= name #</td>
+                  <td class="combo-td">#= surname #</td>
+              </tr>
+        </table>
+        </span>
+    </script>
+<!-- dropdownlist template (if multiple columns present) -->
+
+<script type="text/javascript">
+
+// on document ready
+$(document).ready(function () {
+        //get data from model
+        // default value?!
+        var defaultPersonId = @Model.PersonId;
+        // important to serialize!
+        peopleDS = @Json.Serialize(Model.PeopleList);
+        //set KDDL
+        SetPeopleKDD(peopleDS, defaultPersonId);       
+    });
+
+
+function SetPeopleKDD(peopleDS, defaultPersonId) {
+    
+    var defaultValue = defaultPersonId;
+
+
+    // setup datasource
+        var pDS = new kendo.data.DataSource({
+            data: peopleDS,
+            schema: {
+                model: {
+                    ID: "id",
+                    fields: {
+                        id: { type: "number" },
+                        name: { type: "string", nullable: true },
+                        surname: { type: "string", nullable: true },
+                    }
+                }
+            }
+        });
+    // setup datasource
+
+        //set kdd
+        var rcKDD = $("#PeopleKDD").kendoDropDownList({
+            dataTextField: "surname",
+            dataValueField: "id",
+            dataSource: pDS,
+            value: defaultValue,
+            autoWidth: true,
+            filter: 'contains',
+            filtering: function (e) {
+                //override default filtering function if necessary
+                // this is for multiple columns in dropdownlist
+                var filterValue = e.filter != undefined ? e.filter.value : "";
+                e.preventDefault();
+
+                this.dataSource.filter({
+                    logic: "or",
+                    filters: [
+                        {
+                            field: "name",
+                            operator: "contains",
+                            value: filterValue
+                        },
+                        {
+                            field: "surname",
+                            operator: "contains",
+                            value: filterValue
+                        }
+                    ]
+                });
+            },
+            change: onSelectedPersonChange,
+            headerTemplate: `<table>
+							  <tr class="combo-tr">
+								 <td class="combo-hd-td-200">Name</td>
+								 <td class="combo-hd-td-250">Surname</td>
+		  					   </tr>
+		  					</table>`,
+            template: kendo.template($("#templateKDDLPeople").html())
+        });
+        //set kdd
+       
+    }
+// selection function
+ function onSelectedPersonChange() {
+        var kddData = $("#PeopleKDD").data('kendoDropDownList');
+        var curVal = kddData.value();
+        var valHolder = document.getElementById("PersonId");
+        valHolder.value = curVal;
+        // or jQuery
+        $("#PersonId").val(curVal);
+    }
+// selection function
+
+</script>

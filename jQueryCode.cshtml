@@ -1,0 +1,14 @@
+<script type="text/javascript">
+
+    //get window height
+    var wH = window.innerHeight;
+    //get "static heights"
+    var navH = $("#topNavbarDivWrapper").outerHeight();
+    var btnH = $("#SomeButtonsWrapper").outerHeight();
+    var filtersH = $("#footerDivWrapper").outerHeight();
+    var newHeight = wH - (navH + btnH + filtersH + 50);
+//use to set gird heights
+//div height
+        $("#someDiv").height(newHeight);
+
+    </script>

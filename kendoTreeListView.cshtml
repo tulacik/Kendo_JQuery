@@ -1,0 +1,90 @@
+
+    <div id="TLVWrapper" class="">
+    </div>
+
+
+
+<script>
+    $(document).ready(function() {
+        var someData = @Json.Serialize(Model.SomeData);
+        GetAndSetTLV(someData);
+
+    });
+
+
+function GetAndSetTLV(someData) {
+    //set datasource
+        someTreeListDS = new kendo.data.TreeListDataSource({
+            data: someData,
+            schema: {
+                model: {
+                    id: "id",
+                    parentId: "pid",
+                    fields: {
+                        id: { type: "number" },
+                        pid: { type: "number", nullable: true },
+                        itemDesc: { type: "string", nullable: true },
+                        noteDesc: { type: "string", nullable: true },                        
+                    },
+                    expanded: true
+                }
+            }
+         });
+
+    //set treelist
+      $("#TLVWrapper").kendoTreeList({
+            dataSource: someTreeListDS,
+            height: 450, //or calculate
+            filterable: true,
+            selectable: true,
+            sortable: true,
+            columns: [{
+                title: "titolo riassuntivo", // option to have parent groupping header
+                columns: [
+                    {
+                        field: "", title: "#", width: 50
+                    },
+                    { field: "itemDesc", title: "#", width: 50 },
+                    { field: "itemDesc", title: "", template: '<label style="font-family:wingdings;"> #=  itemDesc # </label>', width: 75 }
+                    ]
+                },
+                {
+                title: "titolo riassuntivo2", // option to have parent groupping header
+                columns: [
+                    {
+                        field: "", title: "#", width: 50
+                    },
+                    { field: "itemDesc", title: "#", width: 50 },
+                    { field: "itemDesc", title: "", template: '<label style="font-family:wingdings;"> #=  itemDesc # </label>', width: 75 }
+                    ]
+                }
+            ],
+            dataBound: replaceTotals // kendo non fa totali per relazione padre figlio!!!
+        });
+
+
+}
+    function replaceTotals() {
+        $('#TLVWrapper .k-grid-content tbody tr.k-grid-footer').remove();
+        $('#TLVWrapper .k-grid-content tbody').append('<tr class="k-grid-footer" data-parentid="null" style="display: table-row;"><td role="gridcell" class="locationName divselected"><span class="k-icon k-i-none"></span></td><td role="gridcell" class="txtalgrit toBeActionedCount">' + 1000 + '</td><td role="gridcell" class="txtalgrit">' + 2500 + '</td><td role="gridcell" class="txtalgrit"> ' + 8025.25 + '</td><td role="gridcell" class="txtalgrit">' + 3500 + '</td><td role="gridcell" class="colId" style="display: none;"></td><td role="gridcell" class="colParentId" style="display: none;"></td><td role="gridcell" class="colLocationCode" style="display: none;"></td></tr>');
+    }
+
+</script>
+
+<!-- template to use for footer "replacement" -->
+<!-- <div class="k-grid-footer" style="padding-right: 17px;">
+	<div class="k-grid-footer-wrap">
+		<table role="grid">
+			<colgroup>
+				<col>
+				<col>
+			</colgroup>
+			<thead role="rowgroup">
+				<tr role="row">
+					<th data-field="NameCount" class="k-footer" role="columnfooter" rowspan="1" data-index="0">total name</th>
+					<th data-field="AmountCount" class="k-footer" role="columnfooter" rowspan="1" data-index="1">total amount</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div> -->

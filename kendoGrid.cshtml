@@ -30,12 +30,13 @@
             data: peopleData,
             schema: {
                 model: {
-                    ID: "personId",
+                    id: "personId",
                     fields: {
                         personId: { type: "number" },
                         name: { type: "string", nullable: true },
                         surname: { type: "string", nullable: true },
                         note: { type: "string", nullable: true },
+                        actualStatusDt: { type:"date", nullable: true },
                         active: { type: "bool", nullable: true }
                     }
                 }
@@ -48,6 +49,8 @@
             height: 150,
             scrollable: true,
             selectable: "row",
+            //  if multiple selection
+            //  selectable: "multiple, row",
             columns: [
                 {
                     field: "personId",
@@ -62,7 +65,15 @@
                 }, {
                     field: "note",
                     title: "Note"
-                }, {
+                }, 
+                {
+                    field: "actualStatusDt", title: "Data stato attuale",
+                    template: '<div class="dtClassStatusDt" data-dt="#: actualStatusDt #">#: actualStatusDt #</div>'
+                },
+                {
+                    field: "actualStatusDt", title: "stato attuale", format: "{0:dd/MM/yyyy}"
+                },
+                {
                     field: "active",
                     title: "Act.",
                     width: 50,
@@ -76,13 +87,85 @@
                         $("#selectedpersonId").val(dataItem.personId);
                     }
                 },
+                 dataBound: function (e) {
+                var gridRows = this.tbody.find("tr");
+                gridRows.each(function (e) {
+                    var statDtInput = $(this).find(".dtClassStatusDt");
+                    var statDtVal = $(statDtInput).data("dt");
+                    var statStrVal = dateToString(statDtVal);
+                    $(statDtInput).html(statStrVal);
+                });
+            }
         });
 
+
+        function getSelectedGridRows() {
+            //for selectedKeyNames schema model: id must be defined!
+            var keyNames = $("#personKGrid").data("kendoGrid").selectedKeyNames();
+            var ids = keyNames.map(function (x) {
+                return parseInt(x, 10);
+            });
+            debugger;
+            var selected = [];
+            var gridData = $("#personKGrid").data("kendoGrid").dataSource.data();
+            ids.forEach(function (number) {
+                gridData.forEach(function (dataItem) {
+                    if (number === dataItem.id) {
+                        selected.push(dataItem);
+                    }
+                })
+            });
+        }
 
         function updateGridDataSource(kgDS) {
              var pKG = $("#personKGrid").data("kendoGrid");
                  pKG.dataSource.data(kgDS);
         }
+
+        function groupGridByColumnName(colName) {
+            var grid = $("#personKGrid").data("kendoGrid");
+            grid.groupable = false;
+            grid.dataSource.group(columnName);
+            grid.dataSource.read();
+            grid.refresh();
+        }
+
+        function dateToString(dateItemObj) {
+        // debugger;
+        if (dateItemObj == '' || dateItemObj == null || dateItemObj == "null") {
+            return"-/-/-";
+        } else {
+
+            dateItem = new Date(dateItemObj);
+            dtStr = dateItem.getDate() +"/" + (dateItem.getMonth() + 1) +"/" + dateItem.getFullYear();
+            // debugger;
+            return dtStr;
+        }
+    }
+
+//filtering
+    function filterProgexUsersGrid() {
+        var searchTerm = $("#filterProgexUsersField").val();
+        var dkg = $("#ProgexUserGridDivWrapper").data("kendoGrid");
+        var ds = dkg.dataSource;
+        ds.query({
+            filter: {
+                logic: "or",
+                filters: [
+                    { field: "lastname", operator: "contains", value: searchTerm },
+                    { field: "firstName", operator: "contains", value: searchTerm },
+                    { field: "initials", operator: "contains", value: searchTerm },
+                    { field: "fullName", operator: "contains", value: searchTerm },
+                    { field: "brchNameL", operator: "contains", value: searchTerm },
+                    { field: "sectDescL", operator: "contains", value: searchTerm },
+                    { field: "userProfileDescL", operator: "contains", value: searchTerm },
+                    { field: "userRole", operator: "contains", value: searchTerm },
+                    { field: "info", operator: "contains", value: searchTerm },
+                    { field: "info2", operator: "contains", value: searchTerm },
+                ]
+            }
+        });
+    }
 
     }
 

@@ -40,6 +40,7 @@ function GetAndSetTLV(someData) {
             sortable: true,
             columns: [{
                 title: "titolo riassuntivo", // option to have parent groupping header
+                // ATTENTION first column cannot be groupped otherwise treelist becomes grid!
                 columns: [
                     {
                         field: "", title: "#", width: 50

@@ -1,3 +1,5 @@
+
+
 <script type="text/javascript">
 
     //get window height
@@ -11,4 +13,14 @@
 //div height
         $("#someDiv").height(newHeight);
 
+
+//convert js date to c# date
+    var today = new Date();
+    var selectedDay = today.getDate();
+    var selectedMonth = today.getMonth() + 1;
+    var selectedYear = today.getFullYear();
+
+//check if input is "checked"
+    var isChecked = document.getElementById("inputCheckElement").checked;
     </script>
+
